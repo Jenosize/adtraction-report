@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adtraction Profit Analysis Report — Norway (NO)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #0f3460;
+    --highlight: #e94560;
+    --green: #00b894;
+    --amber: #fdcb6e;
+    --blue: #0984e3;
+    --purple: #6c5ce7;
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --text: #2d3436;
+    --muted: #636e72;
+    --border: #dfe6e9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  .header {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; padding: 48px 0; text-align: center;
+  }
+  .header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; }
+  .header p { font-size: 1.05rem; opacity: 0.85; }
+  .header .meta { display: flex; justify-content: center; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+  .header .meta-item { background: rgba(255,255,255,0.12); padding: 10px 20px; border-radius: 8px; }
+  .header .meta-item .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+  .header .meta-item .value { font-size: 1.4rem; font-weight: 700; }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: -40px 0 32px; position: relative; z-index: 2; }
+  .kpi-card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; }
+  .kpi-card .kpi-value { font-size: 2rem; font-weight: 800; }
+  .kpi-card .kpi-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+  .kpi-card.green .kpi-value { color: var(--green); }
+  .kpi-card.blue .kpi-value { color: var(--blue); }
+  .kpi-card.purple .kpi-value { color: var(--purple); }
+  .kpi-card.red .kpi-value { color: var(--highlight); }
+  .kpi-card.amber .kpi-value { color: #e17055; }
+
+  .section { margin-bottom: 40px; }
+  .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 3px solid var(--highlight); display: inline-block; }
+  .card { background: var(--card); border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px; }
+
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .chart-card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .chart-card h3 { font-size: 1rem; margin-bottom: 16px; color: var(--accent); }
+  .chart-container { position: relative; height: 320px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  thead th { background: var(--primary); color: #fff; padding: 12px 14px; text-align: left; font-weight: 600; white-space: nowrap; position: sticky; top: 0; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: #f1f3f5; }
+  tbody tr:nth-child(even) { background: #fafbfc; }
+  tbody tr:nth-child(even):hover { background: #f1f3f5; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+  .badge-green { background: #d4edda; color: #155724; }
+  .badge-amber { background: #fff3cd; color: #856404; }
+  .badge-red { background: #f8d7da; color: #721c24; }
+  .badge-blue { background: #cce5ff; color: #004085; }
+  .badge-gray { background: #e2e3e5; color: #383d41; }
+
+  .score-bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--green); min-width: 4px; vertical-align: middle; }
+  .score-bar.medium { background: var(--amber); }
+  .score-bar.low { background: var(--highlight); }
+
+  .insight-box { background: linear-gradient(135deg, #667eea11, #764ba211); border-left: 4px solid var(--purple); padding: 20px 24px; border-radius: 0 12px 12px 0; margin-bottom: 16px; }
+  .insight-box h4 { color: var(--purple); margin-bottom: 6px; }
+
+  .filter-audit { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .filter-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: #f8f9fa; border-radius: 8px; border: 1px solid var(--border); }
+  .filter-item .reason { font-weight: 500; }
+  .filter-item .count { font-weight: 700; color: var(--highlight); }
+
+  .table-scroll { overflow-x: auto; border-radius: 12px; }
+  .footer { text-align: center; padding: 32px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  /* Sortable table styles */
+  .sortable thead th { cursor: pointer; user-select: none; position: relative; padding-right: 22px; }
+  .sortable thead th::after { content: '⇅'; position: absolute; right: 6px; opacity: 0.3; font-size: 0.7rem; }
+  .sortable thead th.sort-asc::after { content: '▲'; opacity: 0.9; }
+  .sortable thead th.sort-desc::after { content: '▼'; opacity: 0.9; }
+
+  /* Filter controls */
+  .table-controls { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .table-controls input, .table-controls select {
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 0.88rem; background: #fff; color: var(--text);
+  }
+  .table-controls input:focus, .table-controls select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(9,132,227,0.15); }
+  .table-controls label { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+  .count-badge { background: var(--accent); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; }
+
+  /* Lead-gen highlight */
+  .leadgen-highlight { background: linear-gradient(135deg, #fdcb6e22, #e1705522); border-left: 4px solid #e17055; padding: 20px 24px; border-radius: 0 12px 12px 0; margin-bottom: 16px; }
+  .leadgen-highlight h4 { color: #e17055; margin-bottom: 6px; }
+
+  @media (max-width: 768px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 1.6rem; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container">
+    <h1>Adtraction Profit Analysis Report</h1>
+    <p>Comprehensive niche & product opportunity analysis for affiliate SEO content</p>
+    <div class="meta">
+      <div class="meta-item"><div class="label">Market</div><div class="value">Norway (NO)</div></div>
+      <div class="meta-item"><div class="label">Currency</div><div class="value">NOK</div></div>
+      <div class="meta-item"><div class="label">Channel</div><div class="value">kjaptforklart</div></div>
+      <div class="meta-item"><div class="label">Scope</div><div class="value">All Programs</div></div>
+      <div class="meta-item"><div class="label">Report Date</div><div class="value">2026-03-16</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- KPI Cards -->
+  <div class="kpi-row">
+    <div class="kpi-card blue"><div class="kpi-value">290</div><div class="kpi-label">Total Programs</div></div>
+    <div class="kpi-card green"><div class="kpi-value">14</div><div class="kpi-label">Approved Partners</div></div>
+    <div class="kpi-card purple"><div class="kpi-value">15</div><div class="kpi-label">Categories</div></div>
+    <div class="kpi-card amber"><div class="kpi-value">1,025</div><div class="kpi-label">Candidate Products</div></div>
+    <div class="kpi-card red"><div class="kpi-value">779</div><div class="kpi-label">Recommended Products</div></div>
+    <div class="kpi-card amber"><div class="kpi-value">277</div><div class="kpi-label">Lead-Gen Programs</div></div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="section">
+    <h2 class="section-title">Executive Summary</h2>
+    <div class="card">
+      <div class="insight-box">
+        <h4>Key Finding: Only 4.8% of available programs are partnered</h4>
+        <p>Out of 290 live programs in the Norwegian market, you are approved with only 14. The remaining 276 programs represent untapped opportunity, especially in <strong>Fashion (33 programs)</strong>, <strong>Home &amp; Garden (43)</strong>, and <strong>Health &amp; Beauty (38)</strong>. However, product feeds are only accessible for approved programs.</p>
+      </div>
+      <div class="insight-box">
+        <h4>Top Niche: Electronics — Highest Commission Per Sale</h4>
+        <p>Shark Gaming dominates with a median commission of <strong>698 NOK per product</strong> and 100% reliability scores. Gaming PCs in the 8,000–33,000 NOK range offer the highest affiliate earnings per conversion.</p>
+      </div>
+      <div class="insight-box">
+        <h4>Volume Niche: Health &amp; Beauty — Most Products, Highest Auto-Promote Rate</h4>
+        <p>360 qualifying products with <strong>84% auto-promote rate</strong>. Three strong programs (Apotekhjem, Chicastore, Fredrik &amp; Louisa) provide diverse product coverage for SEO content.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="section">
+    <h2 class="section-title">Category Performance Analysis</h2>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Final Category Scores</h3>
+        <div class="chart-container"><canvas id="categoryScoreChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Programs: Approved vs Unapproved</h3>
+        <div class="chart-container"><canvas id="approvalChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 2 -->
+  <div class="section">
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Products by Category (Recommended)</h3>
+        <div class="chart-container"><canvas id="productsByCatChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Median Commission Value by Category (NOK)</h3>
+        <div class="chart-container"><canvas id="commissionChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 3 -->
+  <div class="section">
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Auto-Promote Rate by Category</h3>
+        <div class="chart-container"><canvas id="autoPromoteChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Product Filter Funnel</h3>
+        <div class="chart-container"><canvas id="filterChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Rankings Table -->
+  <div class="section">
+    <h2 class="section-title">Category Rankings</h2>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Category</th>
+              <th>Final Score</th>
+              <th>Products</th>
+              <th>Avg Top Product Score</th>
+              <th>Median Commission</th>
+              <th>Auto-Promote Rate</th>
+              <th>Programs (Total)</th>
+              <th>Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td><td><strong>Hobbies &amp; Gifts</strong></td>
+              <td>92.0 <span class="score-bar" style="width:92px"></span></td>
+              <td>161</td><td>73.4</td><td>124.75 NOK</td><td>86%</td><td>17</td>
+              <td><span class="badge badge-green">Top Pick</span></td>
+            </tr>
+            <tr>
+              <td>2</td><td><strong>Electronics</strong></td>
+              <td>90.4 <span class="score-bar" style="width:90px"></span></td>
+              <td>264</td><td>85.8</td><td>698.35 NOK</td><td>37%</td><td>20</td>
+              <td><span class="badge badge-green">Top Pick</span></td>
+            </tr>
+            <tr>
+              <td>3</td><td><strong>Health &amp; Beauty</strong></td>
+              <td>89.0 <span class="score-bar" style="width:89px"></span></td>
+              <td>360</td><td>80.0</td><td>155.10 NOK</td><td>84%</td><td>42</td>
+              <td><span class="badge badge-green">Top Pick</span></td>
+            </tr>
+            <tr>
+              <td>4</td><td><strong>Home &amp; Garden</strong></td>
+              <td>80.8 <span class="score-bar" style="width:81px"></span></td>
+              <td>240</td><td>79.2</td><td>81.52 NOK</td><td>100%</td><td>45</td>
+              <td><span class="badge badge-amber">Strong</span></td>
+            </tr>
+            <tr>
+              <td>5</td><td>Finance</td>
+              <td>5.3 <span class="score-bar low" style="width:5px"></span></td>
+              <td>0</td><td>0</td><td>0</td><td>0%</td><td>44</td>
+              <td><span class="badge badge-gray">No Products</span></td>
+            </tr>
+            <tr>
+              <td>6</td><td>Fashion</td>
+              <td>4.4 <span class="score-bar low" style="width:4px"></span></td>
+              <td>0</td><td>0</td><td>0</td><td>0%</td><td>33</td>
+              <td><span class="badge badge-blue">Opportunity</span></td>
+            </tr>
+            <tr>
+              <td>7</td><td>Automotive</td>
+              <td>3.6 <span class="score-bar low" style="width:4px"></span></td>
+              <td>0</td><td>0</td><td>0</td><td>0%</td><td>14</td>
+              <td><span class="badge badge-gray">No Products</span></td>
+            </tr>
+            <tr>
+              <td>8</td><td>Sport &amp; Outdoors</td>
+              <td>3.1 <span class="score-bar low" style="width:3px"></span></td>
+              <td>0</td><td>0</td><td>0</td><td>0%</td><td>24</td>
+              <td><span class="badge badge-blue">Opportunity</span></td>
+            </tr>
+            <tr>
+              <td>9</td><td>Travel</td>
+              <td>2.9 <span class="score-bar low" style="width:3px"></span></td>
+              <td>0</td><td>0</td><td>0</td><td>0%</td><td>9</td>
+              <td><span class="badge badge-gray">Lead-Gen</span></td>
+            </tr>
+            <tr>
+              <td>10</td><td>Utilities</td>
+              <td>2.6 <span class="score-bar low" style="width:3px"></span></td>
+              <td>0</td><td>0</td><td>0</td><td>0%</td><td>18</td>
+              <td><span class="badge badge-gray">Lead-Gen</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approved Programs Table -->
+  <div class="section">
+    <h2 class="section-title">Approved Partner Programs</h2>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Program</th>
+              <th>Category</th>
+              <th>Score</th>
+              <th>Blended EPC</th>
+              <th>Commission %</th>
+              <th>Products</th>
+              <th>Cookie (days)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Chicastore.no</strong></td><td>Health &amp; Beauty</td><td>61.8</td><td>3.71</td><td>12.0%</td><td>963</td><td>45</td></tr>
+            <tr><td><strong>Apotekhjem.no</strong></td><td>Health &amp; Beauty</td><td>61.7</td><td>5.23</td><td>10.0%</td><td>9,465</td><td>45</td></tr>
+            <tr><td><strong>Shark Gaming NO</strong></td><td>Electronics</td><td>59.6</td><td>10.51</td><td>4.8%</td><td>242</td><td>30</td></tr>
+            <tr><td><strong>Fredrik &amp; Louisa NO</strong></td><td>Health &amp; Beauty</td><td>57.4</td><td>2.49</td><td>10.0%</td><td>18,596</td><td>30</td></tr>
+            <tr><td><strong>Coolstuff NO</strong></td><td>Hobbies &amp; Gifts</td><td>56.4</td><td>2.64</td><td>25.0%</td><td>2,401</td><td>7</td></tr>
+            <tr><td><strong>Kitch'n NO</strong></td><td>Home &amp; Garden</td><td>56.1</td><td>1.55</td><td>8.0%</td><td>32,491</td><td>30</td></tr>
+            <tr><td><strong>I Love Dogs NO</strong></td><td>Hobbies &amp; Gifts</td><td>55.6</td><td>3.19</td><td>8.0%</td><td>1,428</td><td>20</td></tr>
+            <tr><td><strong>Lyko NO</strong></td><td>Health &amp; Beauty</td><td>54.8</td><td>0.96</td><td>10.0%</td><td>60,293</td><td>8</td></tr>
+            <tr><td><strong>Kjell &amp; Co NO</strong></td><td>Electronics</td><td>53.4</td><td>1.25</td><td>4.0%</td><td>10,958</td><td>30</td></tr>
+            <tr><td><strong>Elon NO</strong></td><td>Electronics</td><td>52.4</td><td>2.69</td><td>5.0%</td><td>216</td><td>14</td></tr>
+            <tr><td><strong>Staypro NO</strong></td><td>Home &amp; Garden</td><td>52.4</td><td>1.51</td><td>2.0%</td><td>147,520</td><td>30</td></tr>
+            <tr><td>Norli NO</td><td>Hobbies &amp; Gifts</td><td>27.7</td><td>2.76</td><td>8.0%</td><td>475,861</td><td>20</td></tr>
+            <tr><td>VetZoo NO</td><td>Hobbies &amp; Gifts</td><td>27.0</td><td>15.93</td><td>6.0%</td><td>12,755</td><td>7</td></tr>
+            <tr><td>Jakt &amp; Friluft NO</td><td>Sport &amp; Outdoors</td><td>2.6</td><td>9.09</td><td>8.0%</td><td>0</td><td>45</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Products Table -->
+  <div class="section">
+    <h2 class="section-title">Top 20 Recommended Products</h2>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Program</th>
+              <th>Category</th>
+              <th>Score</th>
+              <th>Band</th>
+              <th>Price (NOK)</th>
+              <th>Commission (NOK)</th>
+              <th>Discount</th>
+              <th>Reliability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><strong>Shark Brutality Gaming-PC</strong></td><td>Shark Gaming</td><td>Electronics</td><td>87.9</td><td><span class="badge badge-green">auto-promote</span></td><td>17,199</td><td>825.55</td><td>14.9%</td><td>100</td></tr>
+            <tr><td>2</td><td><strong>Shark Bloodlust Gaming-PC</strong></td><td>Shark Gaming</td><td>Electronics</td><td>86.7</td><td><span class="badge badge-green">auto-promote</span></td><td>14,199</td><td>681.55</td><td>9.0%</td><td>100</td></tr>
+            <tr><td>3</td><td><strong>Max Bite Extreme Gaming PC</strong></td><td>Shark Gaming</td><td>Electronics</td><td>86.6</td><td><span class="badge badge-green">auto-promote</span></td><td>8,899</td><td>427.15</td><td>14.4%</td><td>100</td></tr>
+            <tr><td>4</td><td><strong>Max Bite Predator Gaming-PC</strong></td><td>Shark Gaming</td><td>Electronics</td><td>86.3</td><td><span class="badge badge-green">auto-promote</span></td><td>10,399</td><td>499.15</td><td>7.1%</td><td>100</td></tr>
+            <tr><td>5</td><td><strong>Shark RGBeast Gaming PC</strong></td><td>Shark Gaming</td><td>Electronics</td><td>86.0</td><td><span class="badge badge-green">auto-promote</span></td><td>25,299</td><td>1,214.35</td><td>5.6%</td><td>100</td></tr>
+            <tr><td>6</td><td><strong>SharkGaming 9V16-60 Laptop</strong></td><td>Shark Gaming</td><td>Electronics</td><td>85.8</td><td><span class="badge badge-green">auto-promote</span></td><td>15,799</td><td>758.35</td><td>4.8%</td><td>100</td></tr>
+            <tr><td>7</td><td><strong>Max Bite Hunter Gaming PC</strong></td><td>Shark Gaming</td><td>Electronics</td><td>85.8</td><td><span class="badge badge-green">auto-promote</span></td><td>14,199</td><td>681.55</td><td>4.7%</td><td>100</td></tr>
+            <tr><td>8</td><td><strong>SharkGaming 9G16-80 Laptop</strong></td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>32,799</td><td>1,574.35</td><td>0%</td><td>100</td></tr>
+            <tr><td>9</td><td><strong>Shark Deep Blue Gaming-PC</strong></td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>25,299</td><td>1,214.35</td><td>0%</td><td>100</td></tr>
+            <tr><td>10</td><td><strong>SharkGaming 9G17-70Ti Laptop</strong></td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>23,799</td><td>1,142.35</td><td>0%</td><td>100</td></tr>
+            <tr><td>11</td><td>SharkGaming Esport Edition</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>22,999</td><td>1,103.95</td><td>0%</td><td>100</td></tr>
+            <tr><td>12</td><td>SharkGaming 9G16-70 Laptop</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>22,299</td><td>1,070.35</td><td>0%</td><td>100</td></tr>
+            <tr><td>13</td><td>Tiny Shark Gaming-PC</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>21,599</td><td>1,036.75</td><td>0%</td><td>100</td></tr>
+            <tr><td>14</td><td>SharkGaming 9G17-70 Laptop</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>20,199</td><td>969.55</td><td>0%</td><td>100</td></tr>
+            <tr><td>15</td><td>Max Bite Ultimator Gaming-PC</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>17,899</td><td>859.15</td><td>0%</td><td>100</td></tr>
+            <tr><td>16</td><td>SharkGaming 9G16-60 Laptop</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>17,899</td><td>859.15</td><td>0%</td><td>100</td></tr>
+            <tr><td>17</td><td>Silent Predator Gaming PC</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>16,399</td><td>787.15</td><td>0%</td><td>100</td></tr>
+            <tr><td>18</td><td>SharkGaming 9G15-50 Laptop</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>16,399</td><td>787.15</td><td>0%</td><td>100</td></tr>
+            <tr><td>19</td><td>Max Bite Bloodlust Gaming-PC</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>14,899</td><td>715.15</td><td>0%</td><td>100</td></tr>
+            <tr><td>20</td><td>Max Bite Brutality Gaming-PC</td><td>Shark Gaming</td><td>Electronics</td><td>84.3</td><td><span class="badge badge-green">auto-promote</span></td><td>13,399</td><td>643.15</td><td>0%</td><td>100</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Opportunity Map -->
+  <div class="section">
+    <h2 class="section-title">Growth Opportunity Map</h2>
+    <div class="card">
+      <p style="margin-bottom:16px; color: var(--muted);">Categories with high unapproved program counts represent untapped partnership opportunities. Product feeds become available only after approval.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Approved</th>
+              <th>Unapproved</th>
+              <th>Total</th>
+              <th>Partnership Coverage</th>
+              <th>Opportunity Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Home &amp; Garden</strong></td><td>2</td><td>43</td><td>45</td><td><span class="score-bar low" style="width:9px"></span> 4%</td><td><span class="badge badge-red">Very High</span></td></tr>
+            <tr><td><strong>Health &amp; Beauty</strong></td><td>4</td><td>38</td><td>42</td><td><span class="score-bar low" style="width:19px"></span> 10%</td><td><span class="badge badge-red">Very High</span></td></tr>
+            <tr><td><strong>Fashion</strong></td><td>0</td><td>33</td><td>33</td><td><span class="score-bar low" style="width:0px"></span> 0%</td><td><span class="badge badge-red">Very High</span></td></tr>
+            <tr><td><strong>Sport &amp; Outdoors</strong></td><td>1</td><td>23</td><td>24</td><td><span class="score-bar low" style="width:8px"></span> 4%</td><td><span class="badge badge-red">Very High</span></td></tr>
+            <tr><td>Electronics</td><td>3</td><td>17</td><td>20</td><td><span class="score-bar medium" style="width:30px"></span> 15%</td><td><span class="badge badge-amber">High</span></td></tr>
+            <tr><td>Utilities</td><td>0</td><td>18</td><td>18</td><td><span class="score-bar low" style="width:0px"></span> 0%</td><td><span class="badge badge-gray">Lead-Gen</span></td></tr>
+            <tr><td>Hobbies &amp; Gifts</td><td>4</td><td>13</td><td>17</td><td><span class="score-bar medium" style="width:47px"></span> 24%</td><td><span class="badge badge-amber">Medium</span></td></tr>
+            <tr><td>Automotive</td><td>0</td><td>14</td><td>14</td><td><span class="score-bar low" style="width:0px"></span> 0%</td><td><span class="badge badge-blue">Explore</span></td></tr>
+            <tr><td>Finance</td><td>0</td><td>44</td><td>44</td><td><span class="score-bar low" style="width:0px"></span> 0%</td><td><span class="badge badge-gray">Lead-Gen</span></td></tr>
+            <tr><td>Family</td><td>0</td><td>10</td><td>10</td><td><span class="score-bar low" style="width:0px"></span> 0%</td><td><span class="badge badge-blue">Explore</span></td></tr>
+            <tr><td>Media</td><td>0</td><td>10</td><td>10</td><td><span class="score-bar low" style="width:0px"></span> 0%</td><td><span class="badge badge-blue">Explore</span></td></tr>
+            <tr><td>Travel</td><td>0</td><td>9</td><td>9</td><td><span class="score-bar low" style="width:0px"></span> 0%</td><td><span class="badge badge-gray">Lead-Gen</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lead-Gen Opportunities -->
+  <div class="section">
+    <h2 class="section-title">Lead-Gen Program Opportunities (277 Programs)</h2>
+    <div class="card">
+      <div class="leadgen-highlight">
+        <h4>These programs pay per lead/signup — no product feed needed</h4>
+        <p>Lead-gen programs pay fixed NOK per conversion (signup, application, booking) or a % of order value. They require <strong>comparison articles, review pages, or landing pages</strong> instead of product listings. Top earners pay up to <strong>10,900 NOK per lead</strong> (Finance).</p>
+      </div>
+
+      <div class="table-controls">
+        <div>
+          <label>Search</label><br>
+          <input type="text" id="leadgenSearch" placeholder="Filter by name, category..." oninput="filterLeadgen()">
+        </div>
+        <div>
+          <label>Category</label><br>
+          <select id="leadgenCatFilter" onchange="filterLeadgen()">
+            <option value="">All Categories</option>
+            <option value="Finance">Finance (44)</option>
+            <option value="Home & Garden">Home & Garden (43)</option>
+            <option value="Health & Beauty">Health & Beauty (38)</option>
+            <option value="Fashion">Fashion (33)</option>
+            <option value="Sport & Outdoors">Sport & Outdoors (24)</option>
+            <option value="Utilities">Utilities (18)</option>
+            <option value="Electronics">Electronics (17)</option>
+            <option value="Automotive">Automotive (14)</option>
+            <option value="Hobbies & Gifts">Hobbies & Gifts (13)</option>
+            <option value="Media">Media (10)</option>
+            <option value="Family">Family (10)</option>
+            <option value="Travel">Travel (9)</option>
+            <option value="Food">Food (2)</option>
+            <option value="Insurance">Insurance (1)</option>
+            <option value="Online services">Online services (1)</option>
+          </select>
+        </div>
+        <div>
+          <label>Type</label><br>
+          <select id="leadgenTypeFilter" onchange="filterLeadgen()">
+            <option value="">All Types</option>
+            <option value="fixed">Fixed NOK (per lead)</option>
+            <option value="percent">% Commission</option>
+          </select>
+        </div>
+        <div style="align-self:flex-end">
+          <span class="count-badge" id="leadgenCount">277 programs</span>
+        </div>
+      </div>
+
+      <div class="table-scroll" style="max-height:600px; overflow-y:auto;">
+        <table class="sortable" id="leadgenTable">
+          <thead>
+            <tr>
+              <th data-col="0" data-type="string">Program</th>
+              <th data-col="1" data-type="string">Category</th>
+              <th data-col="2" data-type="number">Max Fixed (NOK)</th>
+              <th data-col="3" data-type="number">Max %</th>
+              <th data-col="4" data-type="number">EPC</th>
+              <th data-col="5" data-type="number">Cookie (days)</th>
+              <th data-col="6" data-type="string">Commission Details</th>
+              <th data-col="7" data-type="string">Status</th>
+            </tr>
+          </thead>
+          <tbody id="leadgenBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lead-Gen Commission Chart -->
+  <div class="section">
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Top Lead-Gen Commissions by Category (Max Fixed NOK)</h3>
+        <div class="chart-container"><canvas id="leadgenCommChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Lead-Gen Programs by Category</h3>
+        <div class="chart-container"><canvas id="leadgenCatChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Audit -->
+  <div class="section">
+    <h2 class="section-title">Product Filter Audit</h2>
+    <div class="card">
+      <p style="margin-bottom:16px; color: var(--muted);">Why products were rejected during analysis. This helps tune filter parameters for future runs.</p>
+      <div class="filter-audit">
+        <div class="filter-item"><span class="reason">Out of Stock</span><span class="count">116,875</span></div>
+        <div class="filter-item"><span class="reason">Shipping Too High (&gt;30%)</span><span class="count">25,845</span></div>
+        <div class="filter-item"><span class="reason">Suspicious Listing</span><span class="count">7,343</span></div>
+        <div class="filter-item"><span class="reason">Missing Image</span><span class="count">2,386</span></div>
+        <div class="filter-item"><span class="reason">Short Description (&lt;30 chars)</span><span class="count">1,044</span></div>
+        <div class="filter-item"><span class="reason">Missing/Zero Price</span><span class="count">19</span></div>
+        <div class="filter-item"><span class="reason">Service-Like Listing</span><span class="count">1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recommendations -->
+  <div class="section">
+    <h2 class="section-title">Strategic Recommendations</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>Priority</th><th>Action</th><th>Expected Impact</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-red">P1</span></td>
+            <td><strong>Create SEO content for Gaming PCs</strong> — "Beste gaming PC 2026", "Shark Gaming anmeldelse" etc.</td>
+            <td>Highest commission per sale (643–1,574 NOK). 26 auto-promote products ready.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-red">P1</span></td>
+            <td><strong>Create Health &amp; Beauty product roundups</strong> — Apotekhjem, Chicastore, Fredrik &amp; Louisa</td>
+            <td>360 products, 84% auto-promote rate. High content volume potential.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-amber">P2</span></td>
+            <td><strong>Apply to Fashion programs</strong> (33 available) on Adtraction dashboard</td>
+            <td>Entirely new niche with zero current coverage. Could unlock major product catalog.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-amber">P2</span></td>
+            <td><strong>Apply to more Home &amp; Garden programs</strong> (43 unapproved available)</td>
+            <td>Currently only 2 partners with 100% auto-promote rate. More brands = more content.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">P3</span></td>
+            <td><strong>Apply to Sport &amp; Outdoors programs</strong> (23 unapproved)</td>
+            <td>Currently dead niche (1 partner, no feed). Re-run analysis after approval.</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">P3</span></td>
+            <td><strong>Investigate Coolstuff NO</strong> (25% commission rate) for gift guide content</td>
+            <td>Highest commission %, good for seasonal/holiday SEO content.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Generated by <strong>Adtraction Profit Ranker v2.0</strong> &mdash; Channel: kjaptforklart (1715428767) &mdash; Market: NO &mdash; Scope: All Programs &mdash; 2026-03-16</p>
+  </div>
+
+</div>
+
+<script>
+const chartColors = {
+  green: '#00b894',
+  blue: '#0984e3',
+  purple: '#6c5ce7',
+  red: '#e94560',
+  amber: '#fdcb6e',
+  orange: '#e17055',
+  teal: '#00cec9',
+  pink: '#fd79a8',
+};
+
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+// 1) Category Score Chart
+new Chart(document.getElementById('categoryScoreChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Hobbies & Gifts', 'Electronics', 'Health & Beauty', 'Home & Garden', 'Finance', 'Fashion', 'Automotive', 'Sport & Outdoors'],
+    datasets: [{
+      label: 'Final Score',
+      data: [92.0, 90.4, 89.0, 80.8, 5.3, 4.4, 3.6, 3.1],
+      backgroundColor: [chartColors.green, chartColors.green, chartColors.green, chartColors.teal, chartColors.amber, chartColors.orange, chartColors.amber, chartColors.amber],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: { x: { max: 100, grid: { color: '#f0f0f0' } }, y: { grid: { display: false } } }
+  }
+});
+
+// 2) Approved vs Unapproved
+new Chart(document.getElementById('approvalChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Home & Garden', 'Health & Beauty', 'Fashion', 'Finance', 'Sport & Outdoors', 'Electronics', 'Utilities', 'Hobbies & Gifts', 'Automotive'],
+    datasets: [
+      { label: 'Approved', data: [2,4,0,0,1,3,0,4,0], backgroundColor: chartColors.green, borderRadius: 4 },
+      { label: 'Unapproved', data: [43,38,33,44,23,17,18,13,14], backgroundColor: '#dfe6e9', borderRadius: 4 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { position: 'bottom' } },
+    scales: { x: { stacked: true, grid: { color: '#f0f0f0' } }, y: { stacked: true, grid: { display: false } } }
+  }
+});
+
+// 3) Products by Category
+new Chart(document.getElementById('productsByCatChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Health & Beauty (360)', 'Electronics (264)', 'Home & Garden (240)', 'Hobbies & Gifts (161)'],
+    datasets: [{
+      data: [360, 264, 240, 161],
+      backgroundColor: [chartColors.pink, chartColors.blue, chartColors.teal, chartColors.purple],
+      borderWidth: 2, borderColor: '#fff',
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } }
+  }
+});
+
+// 4) Commission Chart
+new Chart(document.getElementById('commissionChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Electronics', 'Health & Beauty', 'Hobbies & Gifts', 'Home & Garden'],
+    datasets: [{
+      label: 'Median Commission (NOK)',
+      data: [698.35, 155.10, 124.75, 81.52],
+      backgroundColor: [chartColors.blue, chartColors.pink, chartColors.purple, chartColors.teal],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { y: { grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
+  }
+});
+
+// 5) Auto-Promote Rate
+new Chart(document.getElementById('autoPromoteChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Home & Garden', 'Hobbies & Gifts', 'Health & Beauty', 'Electronics'],
+    datasets: [{
+      label: 'Auto-Promote Rate',
+      data: [100, 86, 84, 37],
+      backgroundColor: [chartColors.green, chartColors.green, chartColors.green, chartColors.amber],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { max: 100, ticks: { callback: v => v + '%' }, grid: { color: '#f0f0f0' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 6) Lead-Gen Commission by Category
+new Chart(document.getElementById('leadgenCommChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Finance', 'Utilities', 'Health & Beauty', 'Food', 'Home & Garden', 'Media', 'Travel', 'Automotive', 'Electronics', 'Family'],
+    datasets: [{
+      label: 'Top Fixed Commission (NOK)',
+      data: [10900, 700, 400, 250, 348, 500, 222, 154, 300, 130],
+      backgroundColor: [chartColors.orange, chartColors.blue, chartColors.pink, chartColors.green, chartColors.teal, chartColors.purple, chartColors.amber, '#636e72', chartColors.blue, chartColors.pink],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: '#f0f0f0' } }, y: { grid: { display: false } } }
+  }
+});
+
+// 7) Lead-Gen by Category
+new Chart(document.getElementById('leadgenCatChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Finance (44)', 'Home & Garden (43)', 'Health & Beauty (38)', 'Fashion (33)', 'Sport & Outdoors (24)', 'Utilities (18)', 'Electronics (17)', 'Automotive (14)', 'Hobbies & Gifts (13)', 'Other (33)'],
+    datasets: [{
+      data: [44, 43, 38, 33, 24, 18, 17, 14, 13, 33],
+      backgroundColor: [chartColors.orange, chartColors.teal, chartColors.pink, chartColors.purple, chartColors.green, chartColors.blue, '#0984e3', '#636e72', '#6c5ce7', '#dfe6e9'],
+      borderWidth: 2, borderColor: '#fff',
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }
+  }
+});
+
+// 8) Filter Funnel
+new Chart(document.getElementById('filterChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Out of Stock', 'Shipping Too High', 'Suspicious', 'Missing Image', 'Short Description', 'Zero Price', 'Service-Like'],
+    datasets: [{
+      label: 'Products Filtered',
+      data: [116875, 25845, 7343, 2386, 1044, 19, 1],
+      backgroundColor: chartColors.red,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { type: 'logarithmic', grid: { color: '#f0f0f0' },
+        ticks: { callback: v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v }
+      },
+      y: { grid: { display: false } }
+    }
+  }
+});
+// ============================================================
+// Lead-Gen Sortable Table
+// ============================================================
+const LEADGEN_DATA = [
+["Tjenestetorget Finans NO","Finance",10900.0,0,0,30,"Lead - Forbrukslån: 800.0NOK; Lead: Refinansiering med sikkerhet: 100.0NOK; Lead - Kjøretøy lån: 800.0NOK","Not Applied"],
+["Långivere NO","Finance",4500.0,0,0,30,"Small: 0-100k: 650.0NOK; Medium: 100-200k: 1400.0NOK; Large: 200-400k: 3000.0NOK","Not Applied"],
+["Nanofinans NO","Finance",2800.0,0,16.75,45,"Lead - Micro: 200.0NOK; Lead - Low: 1225.0NOK; Lead - High: 2800.0NOK","Not Applied"],
+["Zensum NO","Finance",2500.0,0,100.99,30,"Lead - usikret lån: 2500.0NOK; Lead - Refinansiering med sikkerhet: 2500.0NOK; Lead - Kredittkort: 1200.0NOK","Not Applied"],
+["Heimfinans NO","Finance",2400.0,0,0,30,"Lån med sikkerhet: 2400.0NOK","Not Applied"],
+["Motty - Lån uten sikkerhet/forbrukslån","Finance",2400.0,0,11.74,30,"Godkendt: 2400.0NOK","Not Applied"],
+["eToro NO","Finance",2400.0,0,0,30,"ftd: 2400.0NOK; registration: 0NOK","Not Applied"],
+["Klikklån NO","Finance",2250.0,0,86.54,45,"CPL: 1.0NOK; Konvertering: 2250.0NOK","Not Applied"],
+["Paymark Finans NO","Finance",2250.0,0,20.09,30,"Konvertering: 2250.0NOK; CPL: 1.0NOK","Not Applied"],
+["Thorn NO","Finance",2250.0,0,45.0,30,"CPL: 1.0NOK; Konvertering: 2250.0NOK","Not Applied"],
+["Viiga Lån NO","Finance",2250.0,0,37.5,30,"Konvertering: 2250.0NOK; CPL: 1.0NOK","Not Applied"],
+["Santander Consumer Bank  - Lån inntill kr 400.000 (Note: Email not allowed)","Finance",1640.0,0,117.83,30,"Lead: 1640.0NOK","Not Applied"],
+["Bank Norwegian Forbrukslån og Kredittkort (email is not allowed)","Finance",1500.0,0,202.99,30,"creditcard: 750.0NOK; loan: 1500.0NOK","Not Applied"],
+["Motty - Smålån 10.000 - 100.000","Finance",1400.0,0,0,30,"CPA: 1400.0NOK","Not Applied"],
+["Okida NO","Finance",1350.0,0,123.76,45,"Lead - sikkerhet i bolig: 1350.0NOK","Not Applied"],
+["Digifinans NO","Finance",1300.0,0,15.37,30,"CPA: 1300.0NOK","Not Applied"],
+["Sambla NO","Finance",1300.0,0,6.4,30,"CPA: 1300.0NOK; Lead - Kredittkort: 850.0NOK","Not Applied"],
+["Uno Finans NO","Finance",1300.0,0,9.84,30,"Lead - Usikret lån: 1300.0NOK; Lead - lån med sikkerhet: 1150.0NOK; Lead - Kredittkort: 850.0NOK","Not Applied"],
+["Re:member NO","Finance",1264.0,0,126.67,60,"Black card - Approved S2S: 1264.0NOK; Godkjent Gold kort: 905.0NOK","Not Applied"],
+["Instabank Mastercard NO","Finance",1200.0,0,22.01,30,"Lead - Kredittkort: 1200.0NOK","Not Applied"],
+["Scoopr Refinansiering NO","Finance",1200.0,0,47.05,30,"Refinansiering: 1200.0NOK; Lead: 0NOK","Not Applied"],
+["Trumf Kredittkort NO","Finance",1200.0,0,43.1,30,"Lead: 1200.0NOK","Not Applied"],
+["Ferratum NO","Finance",1100.0,0,10.79,45,"Konvertering: 1100.0NOK","Not Applied"],
+["Lendo NO","Finance",1050.0,0,23.67,30,"Lead - Usikret lån: 750.0NOK; Lead - Kredittkort: 1050.0NOK; Godkjent søknad boliglån: 500.0NOK","Not Applied"],
+["Låneråd NO","Finance",1030.0,0,40.1,30,"CPO: 1030.0NOK; Permission: 36.0NOK","Not Applied"],
+["Motty kredittkort","Finance",1000.0,0,8.13,30,"Godkendt: 1000.0NOK","Not Applied"],
+["Arcadia Finans Norge","Finance",960.0,0,0,30,"signup: 48.0NOK; fallback: 960.0NOK; applications: 960.0NOK","Not Applied"],
+["Zmarta NO","Finance",920.0,0,0,30,"CPL: 920.0NOK","Not Applied"],
+["Motty - lån med sikkerhet i bolig","Finance",800.0,0,0,30,"Lead: 800.0NOK","Not Applied"],
+["TF Bank Mastercard NO","Finance",800.0,0,135.97,30,"Lead - Credit card: 800.0NOK","Not Applied"],
+["Varde Finans NO","Finance",800.0,0,70.55,45,"Godkjent søknad - Refinansiering med sikkerhet: 800.0NOK","Not Applied"],
+["Morrow Bank NO","Finance",700.0,0,101.53,30,"Lead - Norwegian Credit Card: 700.0NOK","Not Applied"],
+["Telia NO","Utilities",700.0,0,13.3,30,"Mobilabonnement: 500.0NOK; Mobilt bredbånd: 500.0NOK; Nettbutikk: 0%","Not Applied"],
+["Ikano Visa NO","Finance",640.0,0,35.01,30,"Godkjent lead: 640.0NOK","Not Applied"],
+["Kredittlånet","Finance",625.0,0,0,30,"Lead: 625.0NOK","Not Applied"],
+["PlussMobil NO","Utilities",600.0,0,26.99,30,"10GB: 500.0NOK; 0 GB: 400.0NOK; Mobilt bredbånd: 600.0NOK","Not Applied"],
+["Allente NO","Media",500.0,0,12.22,30,"Order: 500.0NOK","Not Applied"],
+["Fortum Strøm NO","Utilities",500.0,0,44.44,10,"Spotpris: 500.0NOK","Not Applied"],
+["OneCall NO","Utilities",500.0,0,9.79,30,"FamiliePakka: 500.0NOK; FolkePakka: 500.0NOK; PrøveKjøp: 500.0NOK","Not Applied"],
+["Talkmore NO","Utilities",500.0,0,33.19,30,"Mobilabonnement: 500.0NOK; Kampanje/verving: 500.0NOK","Not Applied"],
+["Instabank NO","Finance",430.0,0,4.67,30,"Lead - Refinansiering med sikkerhet: 430.0NOK","Not Applied"],
+["Ishavskraft strøm","Utilities",400.0,4.0,44.44,30,"Nettbutikk bestilling: 4.0%; Spotpris: 400.0NOK; Nettbutikk bekreftet: 4.0%","Not Applied"],
+["Zooca","Health & Beauty",400.0,0,2.78,45,"Lead: 400.0NOK","Not Applied"],
+["ice NO","Utilities",385.0,0,17.21,30,"Mobilabonnement: 300.0NOK; Mobiltelefon: 385.0NOK; Junior: 300.0NOK","Not Applied"],
+["Viaplay NO","Media",380.0,0,4.13,30,"SVOD TMSP - Viaplay Total: 380.0NOK; SVOD TMSM - Viaplay medium: 200.0NOK; SVOD TM: 80.0NOK","Not Applied"],
+["Gullbrev NO","Finance",375.0,0,2.6,45,"Lead: 375.0NOK","Not Applied"],
+["Biotics.no","Health & Beauty",350.0,0,0,30,"Salg: 350.0NOK","Not Applied"],
+["Bærum energi NO","Utilities",350.0,0,0.99,30,"Ordre: 350.0NOK; Spotprisavtale: 350.0NOK","Not Applied"],
+["Calstop.no","Health & Beauty",350.0,0,4.25,30,"Salg: 350.0NOK","Not Applied"],
+["Cheap Energy NO","Utilities",350.0,0,11.48,30,"Order: 350.0NOK","Not Applied"],
+["Easeformula.no","Health & Beauty",350.0,0,0,30,"Salg: 350.0NOK","Not Applied"],
+["Kilden Kraft NO","Utilities",350.0,0,15.56,30,"Ordre: 350.0NOK","Not Applied"],
+["Nordicmelatonin.no","Health & Beauty",350.0,0,13.79,30,"Salg: 350.0NOK","Not Applied"],
+["VitaePro NO","Health & Beauty",350.0,0,9.38,30,"Order: 350.0NOK","Not Applied"],
+["Tjenestetorget - Eiendomsmegler NO","Home & Garden",348.0,0,0,30,"CPL: 348.0NOK","Not Applied"],
+["Nordnet NO","Finance",320.0,0,4.0,30,"Sign-up: 320.0NOK","Not Applied"],
+["Eiendomsmegler.no - La meglerne by på deg","Home & Garden",315.0,0,0,30,"fallback: 0.01NOK; Salg: 315.0NOK; Utleie: 0.01NOK","Not Applied"],
+["Agva Strømkampanje","Utilities",304.0,0,25.52,7,"Sale: 304.0NOK","Not Applied"],
+["Xplora NO","Electronics",300.0,12.0,5.0,30,"Sale: 12.0%","Not Applied"],
+["Klarkraft","Utilities",300.0,0,39.13,30,"Lead: 300.0NOK","Not Applied"],
+["Maxulin NO","Health & Beauty",300.0,0,8.61,1,"Order: 300.0NOK","Not Applied"],
+["Strim NO","Media",300.0,0,0.43,30,"Strim Grunnpakke: 200.0NOK; Strim Grunnpakke + TV2 Play Sport: 250.0NOK; Strim Grunnpakke + TV2 Play Sport + Viaplay Total: 300.0NOK","Not Applied"],
+["Tibber NO","Utilities",300.0,0,23.25,30,"Strømavtale: 300.0NOK","Not Applied"],
+["Royal Tan","Health & Beauty",280.0,0,16.0,15,"Lead: 280.0NOK","Not Applied"],
+["Santander Sparekonto","Finance",275.0,0,0,30,"Lead: 275.0NOK","Not Applied"],
+["Lyca Mobile NO","Utilities",272.0,0,0,30,"60-99: 272.0NOK; 0-59: 272.0NOK; 100-119: 272.0NOK","Not Applied"],
+["Finfly.no","Finance",250.0,0,0,30,"Lead: 250.0NOK","Not Applied"],
+["Godtlevert NO","Food",250.0,0,29.47,7,"Matkasse: 250.0NOK","Not Applied"],
+["HelloFresh NO","Food",250.0,0,13.88,30,"Order: 250.0NOK; Reactivation: 75.0NOK","Not Applied"],
+["Mobilabonnement.no","Utilities",250.0,0,0,30,"Enkelt-lead: 125.0NOK; Bedrift-lead: 250.0NOK; Familie-lead: 200.0NOK","Not Applied"],
+["Flyhjelp NO","Travel",222.0,0,8.33,30,"Lead: 222.0NOK","Not Applied"],
+["SkyShowtime NO","Media",220.0,0,5.27,30,"Yearly subscription: 220.0NOK; Monthly subscription: 58.0NOK","Not Applied"],
+["Uno Score NO","Finance",212.0,0,21.98,30,"Sjekk din boligverdi: 34.0NOK; Gjeldsoversikt: 212.0NOK","Not Applied"],
+["Collaxan NO","Health & Beauty",200.0,0,9.09,30,"Salg: 200.0NOK","Not Applied"],
+["OsloSkinlab NO","Health & Beauty",200.0,0,6.84,1,"Order: 200.0NOK","Not Applied"],
+["Saxo Bank NO","Finance",200.0,0,0,7,"Lead: 200.0NOK","Not Applied"],
+["Myloan24 - NO","Finance",180.0,0,0,30,"CPL: 180.0NOK","Not Applied"],
+["Testen NO","Automotive",154.0,0,4.4,30,"Salg: 154.0NOK","Not Applied"],
+["Hei Albert NO","Family",130.0,0,13.64,30,"Order: 130.0NOK","Not Applied"],
+["Tjenestetorget - Advokat NO","Home & Garden",130.0,0,0,30,"CPL: 130.0NOK","Not Applied"],
+["Tjenestetorget - Regnskapsfører NO","Online services",130.0,0,0,30,"CPL: 130.0NOK","Not Applied"],
+["Tjenestetorget - Solskjerming NO","Home & Garden",130.0,0,6.61,30,"CPL: 130.0NOK","Not Applied"],
+["Tjenestetorget - Utleiemegler NO","Home & Garden",130.0,0,0,30,"CPL: 130.0NOK","Not Applied"],
+["Samlerhuset NO","Hobbies & Gifts",115.0,0,0,30,"Order: 115.0NOK","Not Applied"],
+["Abonera NO","Fashion",100.0,20.0,0,30,"Salg: 20.0%","Not Applied"],
+["forsikringtest.no","Utilities",100.0,0,7.05,30,"1 Forsikring: 65.0NOK; Flere forsikringer: 100.0NOK","Not Applied"],
+["Strøm.no - Finn en bedre og billigere strømavtale i ditt område","Electronics",95.0,0,0,30,"Lead: 95.0NOK","Not Applied"],
+["Tjenestetorget - Forsikring NO","Insurance",87.0,0,14.92,30,"Forsikring 1: 51.0NOK; Forsikring 2: 87.0NOK","Not Applied"],
+["Tjenestetorget - TV-Pakker NO","Media",87.0,0,0,30,"CPL: 87.0NOK","Not Applied"],
+["Tjenestetorget - Varmepumpe NO","Home & Garden",81.0,0,1.05,30,"CPL: 81.0NOK","Not Applied"],
+["BookBeat NO","Media",80.0,0,11.05,10,"Order: 80.0NOK","Not Applied"],
+["Tjenestetorget - Mobilabbonement NO","Utilities",78.0,0,0,30,"CPL: 78.0NOK","Not Applied"],
+["Storytel NO","Media",60.0,0,17.5,30,"Signup: 60.0NOK","Not Applied"],
+["uScore NO","Finance",60.0,0,4.94,1,"Signup: 60.0NOK","Not Applied"],
+["On that Ass NO","Fashion",54.0,0,0.55,30,"Men´s: 50.0NOK; Women's: 54.0NOK","Not Applied"],
+["Tjenestetorget - Varmepumpeservice NO","Home & Garden",52.0,0,0,30,"CPL: 52.0NOK","Not Applied"],
+["Kinoklubb.no","Hobbies & Gifts",50.0,0,3.91,45,"Signup: 50.0NOK","Not Applied"],
+["Nextory NO","Media",50.0,0,8.87,7,"Signup: 50.0NOK","Not Applied"],
+["Tjenestetorget - Bredbånd NO","Utilities",48.0,0,0,30,"CPL: 48.0NOK","Not Applied"],
+["Tjenestetorget - Flyttebyrå NO","Home & Garden",47.0,0,0,30,"CPL: 47.0NOK","Not Applied"],
+["Monee - NO","Finance",45.0,0,30.79,30,"Lead: 45.0NOK","Not Applied"],
+["Tjenestetorget - Garasjeporter NO","Home & Garden",44.0,0,0,30,"CPL: 44.0NOK","Not Applied"],
+["Varmepumpe.no - Få gode tilbud på varmepumper","Electronics",42.5,0,0,30,"Lead: 42.5NOK","Not Applied"],
+["Fabel NO","Media",36.0,0,11.03,45,"Signup: 36.0NOK","Not Applied"],
+["Bredbånd.no - Få tilbud på bredbånd fra flere aktører","Electronics",24.0,0,0,30,"Lead: 24.0NOK","Not Applied"],
+["Dekk.eu NO","Automotive",1.25,4.0,0.04,30,"Salg: 4.0%; Lead: 1.25NOK","Not Applied"],
+["DentaWorks NO","Health & Beauty",0,25.0,3.66,30,"Avslut: 25.0%; Övrigt: 20.0%","Not Applied"],
+["Batteriexperten NO","Electronics",0,20.0,10.89,45,"Order: 20.0%","Not Applied"],
+["Comforth Scandinavia NO","Health & Beauty",0,20.0,17.06,10,"Order: 20.0%","Not Applied"],
+["Hairlust NO","Health & Beauty",0,20.0,6.69,30,"Ordre: 20.0%","Not Applied"],
+["Livet Leker NO","Hobbies & Gifts",0,20.0,9.16,30,"Ordre: 20.0%","Not Applied"],
+["Merkmini NO","Family",0,20.0,1.21,45,"Order: 20.0%","Not Applied"],
+["Nordicprint NO","Family",0,20.0,7.84,7,"Order: 20.0%","Not Applied"],
+["Norzen NO","Health & Beauty",0,20.0,0,30,"Order: 20.0%","Not Applied"],
+["Vuxen NO","Health & Beauty",0,20.0,10.9,30,"Order: 20.0%","Not Applied"],
+["IPhonehuset","Electronics",0,18.0,2.01,45,"Sale: 12.0%","Not Applied"],
+["Stille NO","Home & Garden",0,18.0,14.04,30,"Order: 18.0%","Not Applied"],
+["ONYX Cookware NO","Home & Garden",0,17.7,10.91,30,"Sale: 17.7%","Not Applied"],
+["Lappeliten - strykefrie navnelapper som tåler vask","Family",0,16.0,9.84,30,"Sale: 16.0%","Not Applied"],
+["Balion NO","Fashion",0,15.0,0,30,"Salg: 15.0%","Not Applied"],
+["InkClub NO","Electronics",0,15.0,17.13,1,"Order: 15.0%","Not Applied"],
+["Nemo NO","Sport & Outdoors",0,15.0,0,30,"Salg: 15.0%","Not Applied"],
+["Pace NO","Health & Beauty",0,15.0,0,30,"Ordre: 15.0%","Not Applied"],
+["Woome.no","Health & Beauty",0,15.0,6.56,45,"Order: 15.0%","Not Applied"],
+["inCover.no","Media",0,15.0,6.97,45,"Sale: 15.0%","Not Applied"],
+["Askeladden Navnelapper NO","Family",0,13.8,11.54,45,"Salg: 13.8%","Not Applied"],
+["RevolutionRace NO","Sport & Outdoors",0,13.0,7.1,30,"Order: 13.0%","Not Applied"],
+["Agelab NO","Health & Beauty",0,12.0,14.81,30,"Order: 12.0%","Not Applied"],
+["CURLI NO","Health & Beauty",0,12.0,0,45,"Order: 12.0%","Not Applied"],
+["Gullfunn NO","Hobbies & Gifts",0,12.0,0.85,45,"Ordre: 12.0%","Not Applied"],
+["Inkmann NO","Electronics",0,12.0,5.61,30,"Sale: 12.0%","Not Applied"],
+["Introni NO","Home & Garden",0,12.0,0,45,"Salg: 12.0%","Not Applied"],
+["Kokkeglede NO","Home & Garden",0,12.0,2.1,30,"Ordre: 12.0%","Not Applied"],
+["Kärcher NO","Home & Garden",0,12.0,5.01,30,"Ordre: 12.0%","Not Applied"],
+["Lindex NO","Fashion",0,12.0,1.34,30,"Order: 12.0%","Not Applied"],
+["Lysterapi.no","Health & Beauty",0,12.0,17.29,30,"Sale: 12.0%","Not Applied"],
+["Smartphoto NO","Hobbies & Gifts",0,12.0,0.8,30,"Old customer order: 7.0%; New customer order: 12.0%","Not Applied"],
+["Watery NO","Sport & Outdoors",0,12.0,12.41,14,"Sale: 12.0%; Sale PB: 5.5%","Not Applied"],
+["Maanesten NO","Fashion",0,11.54,6.54,15,"Sale: 11.54%","Not Applied"],
+["Björn Borg NO","Fashion",0,11.0,6.24,30,"Sale: 11.0%","Not Applied"],
+["Bodystore NO","Health & Beauty",0,11.0,2.4,10,"Order: 11.0%; New customer: 11.0%","Not Applied"],
+["Extra Optical NO","Fashion",0,11.0,3.66,30,"Order: 11.0%","Not Applied"],
+["Fiskeonline NO","Sport & Outdoors",0,11.0,5.74,45,"Order: 11.0%","Not Applied"],
+["Hudprodukter NO","Health & Beauty",0,11.0,6.34,30,"Order: 11.0%","Not Applied"],
+["KitchenTime NO","Home & Garden",0,11.0,2.38,15,"Order: 8.0%","Not Applied"],
+["Nordic Nest NO","Home & Garden",0,11.0,4.31,15,"Order: 8.0%","Not Applied"],
+["Reliefr NO","Health & Beauty",0,11.0,0,7,"Salg: 11.0%","Not Applied"],
+["Stylingagenten NO","Health & Beauty",0,11.0,1.54,45,"Order: 11.0%","Not Applied"],
+["Backe i Grensen NO","Home & Garden",0,10.8,1.12,30,"Ordre: 10.8%","Not Applied"],
+["Lampemesteren NO","Home & Garden",0,10.4,13.46,30,"CPS: 10.4%; CPS Voucher: 6.5%","Not Applied"],
+["Murlong Cres NO","Fashion",0,10.4,0,45,"Order: 10.4%","Not Applied"],
+["Urban Pioneers Concept Store NO","Fashion",0,10.4,3.54,30,"Ordre: 10.4%","Not Applied"],
+["Asuro NO","Electronics",0,10.0,0,30,"Salg: 10.0%","Not Applied"],
+["Autodude NO","Automotive",0,10.0,0,7,"Order: 10.0%","Not Applied"],
+["BERG NO","Hobbies & Gifts",0,10.0,3.93,45,"Order: 10.0%","Not Applied"],
+["Barbershop.no","Fashion",0,10.0,0.18,7,"Sale 10: 10.0%","Not Applied"],
+["Beauty Mall NO","Health & Beauty",0,10.0,1.4,30,"Order: 10.0%","Not Applied"],
+["BilXtra","Automotive",0,10.0,2.91,30,"Order: 10.0%","Not Applied"],
+["Bildeler.no","Automotive",0,10.0,12.16,45,"Ordre: 10.0%","Not Applied"],
+["Brilleland NO","Fashion",0,10.0,3.07,45,"Order: 10.0%","Not Applied"],
+["Christiania Glasmagasin NO","Home & Garden",0,10.0,3.87,30,"CG sale: 10.0%","Not Applied"],
+["Daniel Wellington NO","Fashion",0,10.0,3.37,30,"Order: 10.0%","Not Applied"],
+["Detailshop NO","Automotive",0,10.0,0.27,45,"Ordre: 10.0%","Not Applied"],
+["Get Inspired NO (internal tracking)","Sport & Outdoors",0,10.0,0,1,"Sale: 10.0%","Not Applied"],
+["Greatlife NO","Health & Beauty",0,10.0,0,45,"Sale 10: 10.0%","Not Applied"],
+["Interoptik NO","Fashion",0,10.0,3.04,30,"Order: 10.0%","Not Applied"],
+["Kayani NO","Fashion",0,10.0,3.48,30,"Order: 10.0%","Not Applied"],
+["Kondomkongen NO","Health & Beauty",0,10.0,0.62,45,"Sale 10: 10.0%","Not Applied"],
+["L'Occitane NO","Health & Beauty",0,10.0,2.94,14,"Salg: 10.0%","Not Applied"],
+["P Lindberg - NO","Hobbies & Gifts",0,10.0,5.39,45,"Ny kunde: 8.0%; Eksisterende kunde: 8.0%","Not Applied"],
+["Partyking.no","Hobbies & Gifts",0,10.0,4.3,30,"Sale 10: 10.0%","Not Applied"],
+["Pilgrim NO","Fashion",0,10.0,1.73,7,"Order: 10.0%","Not Applied"],
+["Prydligt NO","Fashion",0,10.0,3.68,45,"Order: 10.0%","Not Applied"],
+["Seatronic NO","Automotive",0,10.0,1.5,30,"Nettbutikk: 10.0%","Not Applied"],
+["Slikkepott NO","Home & Garden",0,10.0,2.59,30,"Ordre: 10.0%","Not Applied"],
+["Stylein NO","Fashion",0,10.0,0,30,"Order: 10.0%","Not Applied"],
+["Timarco NO","Fashion",0,10.0,1.43,45,"Sale standard: 10.0%; Sale campaign: 5.0%","Not Applied"],
+["Trygg Helse","Sport & Outdoors",0,10.0,3.77,45,"Order: 10.0%","Not Applied"],
+["Valostore NO","Home & Garden",0,10.0,0,7,"Order: 10.0%","Not Applied"],
+["Xlash NO","Health & Beauty",0,10.0,0.92,30,"Salg: 10.0%","Not Applied"],
+["Bakeren og Kokken NO","Home & Garden",0,9.0,3.47,5,"Order: 9.0%","Not Applied"],
+["Drømmerom NO","Home & Garden",0,9.0,0,45,"Order: 9.0%","Not Applied"],
+["Newport NO","Home & Garden",0,9.0,5.7,30,"Order: 9.0%","Not Applied"],
+["Stormberg NO","Sport & Outdoors",0,9.0,3.67,30,"Order: 9.0%","Not Applied"],
+["Trendcarpet NO","Home & Garden",0,9.0,0,45,"Order: 9.0%","Not Applied"],
+["KICKS NO","Health & Beauty",0,8.5,3.67,1,"Order: 8.5%","Not Applied"],
+["4 Men 4 Women","Fashion",0,8.0,3.09,30,"Salg: 8.0%","Not Applied"],
+["ARK Bokhandel NO","Hobbies & Gifts",0,8.0,2.51,30,"Salg: 8.0%","Not Applied"],
+["Beautycos NO","Health & Beauty",0,8.0,1.33,30,"Order: 8.0%","Not Applied"],
+["Bikbok.no","Fashion",0,8.0,2.05,30,"Order: 8.0%","Not Applied"],
+["Clarins NO","Health & Beauty",0,8.0,1.5,30,"Sale 8: 8.0%","Not Applied"],
+["Devold NO","Sport & Outdoors",0,8.0,4.73,15,"Order: 8.0%","Not Applied"],
+["E-Wheels NO","Automotive",0,8.0,2.45,30,"Order e-wheels.no: 8.0%","Not Applied"],
+["Framsport","Sport & Outdoors",0,8.0,2.42,30,"Ordre: 8.0%","Not Applied"],
+["Frederik Bagger NO","Home & Garden",0,8.0,3.95,30,"CPS: 8.0%","Not Applied"],
+["Glimja NO","Health & Beauty",0,8.0,0.78,45,"Sale 8: 8.0%","Not Applied"],
+["Guttelus NO","Family",0,8.0,0,14,"Salg: 8.0%","Not Applied"],
+["Icebug NO","Sport & Outdoors",0,8.0,1.56,30,"Order: 8.0%","Not Applied"],
+["Interflora.no","Hobbies & Gifts",0,8.0,4.95,30,"Ordre: 8.0%","Not Applied"],
+["Jakt & Friluft NO","Sport & Outdoors",0,8.0,10.37,45,"Order: 8.0%","Approved"],
+["Junkyard NO","Fashion",0,8.0,2.21,30,"Order: 8.0%","Not Applied"],
+["Kajakk og Fritid NO","Hobbies & Gifts",0,8.0,2.07,30,"Ordre: 8.0%","Not Applied"],
+["Kinogavekort.no","Hobbies & Gifts",0,8.0,18.67,45,"Order: 8.0%","Not Applied"],
+["Kouture NO","Fashion",0,8.0,3.16,45,"Ordre: 8.0%","Not Applied"],
+["Kremmerhuset NO","Home & Garden",0,8.0,0.09,45,"Salg: 8.0%","Not Applied"],
+["Løpeshop NO","Sport & Outdoors",0,8.0,3.42,7,"Salg: 5.0%","Not Applied"],
+["Makeup Mekka NO","Health & Beauty",0,8.0,3.54,30,"Order: 8.0%","Not Applied"],
+["Med24 NO","Health & Beauty",0,8.0,3.58,30,"Ordre: 8.0%","Not Applied"],
+["Munk Store NO","Fashion",0,8.0,2.51,30,"Order: 8.0%","Not Applied"],
+["Piggsko.no","Sport & Outdoors",0,8.0,0.96,30,"Order: 8.0%","Not Applied"],
+["Polarn O. Pyret NO","Family",0,8.0,5.86,30,"order: 8.0%","Not Applied"],
+["Princess Butikken NO","Home & Garden",0,8.0,5.01,45,"Salg: 8.0%","Not Applied"],
+["SWIMS NO","Fashion",0,8.0,8.55,14,"Salg: 8.0%","Not Applied"],
+["Skogstad Sport NO","Sport & Outdoors",0,8.0,4.49,30,"Order: 8.0%","Not Applied"],
+["Sor-Tre NO","Home & Garden",0,8.0,0,45,"Ordre: 8.0%","Not Applied"],
+["Sporttema NO","Sport & Outdoors",0,8.0,3.54,45,"Sale: 8.0%","Not Applied"],
+["Tilbords NO","Home & Garden",0,8.0,1.55,30,"Order: 8.0%","Not Applied"],
+["Urban Pioneers NO","Fashion",0,8.0,1.78,30,"Ordre: 8.0%","Not Applied"],
+["VPG.no","Sport & Outdoors",0,8.0,5.12,30,"Ordre: 6.0%","Not Applied"],
+["You & I NO","Fashion",0,8.0,3.95,30,"Ordre: 8.0%","Not Applied"],
+["Bangerhead NO","Health & Beauty",0,7.0,1.63,2,"Order: 7.0%","Not Applied"],
+["CAMILLA PIHL NO","Fashion",0,7.0,4.71,30,"Affiliate Sales: 7.0%","Not Applied"],
+["Cellbes NO","Fashion",0,7.0,2.57,30,"Order new customer: 7.0%; Order: 7.0%","Not Applied"],
+["Fyri Resort NO","Travel",0,7.0,5.79,30,"Pakkedeal: 7.0%","Not Applied"],
+["Jollyroom NO","Family",0,7.0,2.85,3,"Order: 5.0%","Not Applied"],
+["Sembo NO","Travel",0,7.0,27.39,45,"Order: 7.0%","Not Applied"],
+["Sparkfix NO","Automotive",0,7.0,14.64,30,"Order: 7.0%","Not Applied"],
+["TT-Line NO","Travel",0,7.0,0,45,"Booking: 7.0%","Not Applied"],
+["Trademax NO","Home & Garden",0,7.0,3.58,10,"Order: 7.0%","Not Applied"],
+["VidaXL NO","Home & Garden",0,7.0,1.82,30,"Sale: 7.0%","Not Applied"],
+["Vinlagringskompaniet NO","Home & Garden",0,7.0,0,45,"Order: 7.0%","Not Applied"],
+["Bubbleroom NO","Fashion",0,6.0,1.97,20,"Order: 6.0%","Not Applied"],
+["Floyd NO","Fashion",0,6.0,4.08,30,"Order: 6.0%","Not Applied"],
+["NordicFeel NO","Health & Beauty",0,6.0,6.79,15,"Sale: 6.0%","Not Applied"],
+["Safira NO","Fashion",0,6.0,3.95,45,"Order: 6.0%","Not Applied"],
+["Skistart NO","Sport & Outdoors",0,6.0,1.81,15,"Order: 6.0%","Not Applied"],
+["Skruvat NO","Automotive",0,6.0,16.69,45,"Sale: 6.0%; Däck och fälg: 2.0%","Not Applied"],
+["Sportproffen NO","Sport & Outdoors",0,6.0,9.51,45,"Order: 6.0%","Not Applied"],
+["Weekday NO","Fashion",0,6.0,0.76,60,"Order: 6.0%","Not Applied"],
+["Axkid NO","Family",0,5.0,0,45,"Order: 5.0%","Not Applied"],
+["Blivakker NO","Health & Beauty",0,5.0,0,10,"Order: 5.0%","Not Applied"],
+["Bosch Home NO","Electronics",0,5.0,1.76,45,"Order: 5.0%","Not Applied"],
+["Byttdekk NO","Automotive",0,5.0,2.82,2,"Hjul: 5.0%; Dekk: 4.0%; Felg: 5.0%","Not Applied"],
+["Chilli NO","Home & Garden",0,5.0,0.75,7,"Order: 5.0%","Not Applied"],
+["Estore NO","Electronics",0,5.0,0.4,15,"General: 5.0%","Not Applied"],
+["Eurodel NO","Automotive",0,5.0,10.08,45,"sale: 5.0%","Not Applied"],
+["Football Travel NO","Travel",0,5.0,0,30,"CPS: 5.0%","Not Applied"],
+["Gymgrossisten NO","Sport & Outdoors",0,5.0,8.57,10,"Godkjent kjøp: 5.0%; New customer: 5.0%","Not Applied"],
+["Kilands NO","Home & Garden",0,5.0,0.32,30,"Sale 5: 5.0%","Not Applied"],
+["Länna Møbler NO","Home & Garden",0,5.0,0.53,7,"Order: 5.0%","Not Applied"],
+["MM Sports NO","Sport & Outdoors",0,5.0,8.9,30,"Order: 5.0%; New customer: 5.0%","Not Applied"],
+["Myoutdoorkitchen NO","Home & Garden",0,5.0,0,45,"Order: 5.0%","Not Applied"],
+["Myrangecooker NO","Home & Garden",0,5.0,0,45,"Order: 5.0%","Not Applied"],
+["Nordiska Galleriet NO","Home & Garden",0,5.0,2.53,7,"Order: 5.0%","Not Applied"],
+["Outdoorexperten NO","Sport & Outdoors",0,5.0,0.06,20,"Sale 5: 5.0%","Not Applied"],
+["Siemens Home NO","Electronics",0,5.0,0.64,45,"Order: 5.0%","Not Applied"],
+["Sportgymbutikken.no","Sport & Outdoors",0,5.0,5.78,45,"Order 5: 5.0%","Not Applied"],
+["Widforss NO","Sport & Outdoors",0,5.0,3.53,30,"Order: 5.0%","Not Applied"],
+["Proshop NO","Electronics",0,4.8,0.88,7,"Sale: 3.2%","Not Applied"],
+["Amisol NO","Travel",0,4.0,1.89,30,"Order: 4.0%","Not Applied"],
+["Babyland NO","Family",0,4.0,2.85,30,"Order: 4.0%","Not Applied"],
+["CS MEGASTORE NO","Electronics",0,4.0,1.35,3,"Order: 4.0%","Not Applied"],
+["Hulténs NO","Home & Garden",0,4.0,1.94,30,"Order: 4.0%","Not Applied"],
+["Komplett NO","Electronics",0,4.0,3.86,10,"order: 2.5%","Not Applied"],
+["Lekekassen NO","Hobbies & Gifts",0,4.0,0.74,7,"Ordre: 4.0%","Not Applied"],
+["Lunehjem.no","Home & Garden",0,4.0,3.82,45,"Sale: 4.0%","Not Applied"],
+["MAXA.no","Sport & Outdoors",0,4.0,7.88,15,"Order: 4.0%","Not Applied"],
+["Rolfs reiser","Travel",0,4.0,0,14,"Order ny kunde: 4.0%; Order kunde: 2.0%","Not Applied"],
+["Skeidar NO","Home & Garden",0,4.0,0,30,"Ordre: 4.0%","Not Applied"],
+["Sportshopen NO","Fashion",0,4.0,1.1,10,"Sale 4: 4.0%","Not Applied"],
+["Vy Buss NO","Travel",0,4.0,4.66,20,"Order: 4.0%","Not Applied"],
+["Evobike NO","Automotive",0,3.0,2.44,30,"Salg: 3.0%","Not Applied"],
+["Gotogate.no","Travel",0,3.0,3.09,30,"Sale: 3.0%","Not Applied"],
+["Tirendo NO","Automotive",0,3.0,4.31,30,"Order: 3.0%","Not Applied"],
+["Dustin NO","Electronics",0,2.0,0.4,7,"Order Bedrift: 2.0%","Not Applied"],
+["Grønt Fokus NO","Home & Garden",0,2.0,8.83,30,"Order: 2.0%","Not Applied"],
+["Teknikproffset NO","Electronics",0,2.0,0.28,45,"Sale 2: 2.0%","Not Applied"]
+];
+
+let leadgenSortCol = 2;
+let leadgenSortAsc = false;
+
+function renderLeadgen(data) {
+  const tbody = document.getElementById('leadgenBody');
+  tbody.innerHTML = '';
+  data.forEach(r => {
+    const tr = document.createElement('tr');
+    const maxFixed = r[2];
+    const maxPct = r[3];
+    const epc = r[4];
+    const cookie = r[5];
+    const status = r[7];
+    const statusBadge = status === 'Approved'
+      ? '<span class="badge badge-green">Approved</span>'
+      : '<span class="badge badge-gray">Not Applied</span>';
+    
+    let commType = '';
+    if (maxFixed > 0 && maxPct > 0) commType = '<span class="badge badge-amber">Fixed + %</span>';
+    else if (maxFixed > 0) commType = '<span class="badge badge-red">Fixed NOK</span>';
+    else if (maxPct > 0) commType = '<span class="badge badge-blue">% Commission</span>';
+
+    tr.innerHTML = `
+      <td><strong>${r[0]}</strong></td>
+      <td>${r[1]}</td>
+      <td>${maxFixed > 0 ? maxFixed.toLocaleString('en') + ' NOK' : '—'} ${commType}</td>
+      <td>${maxPct > 0 ? maxPct.toFixed(1) + '%' : '—'}</td>
+      <td>${epc > 0 ? epc.toFixed(2) : '—'}</td>
+      <td>${cookie}d</td>
+      <td style="max-width:300px; font-size:0.78rem; color:#636e72;">${r[6]}</td>
+      <td>${statusBadge}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('leadgenCount').textContent = data.length + ' programs';
+}
+
+function filterLeadgen() {
+  const search = (document.getElementById('leadgenSearch').value || '').toLowerCase();
+  const catFilter = document.getElementById('leadgenCatFilter').value;
+  const typeFilter = document.getElementById('leadgenTypeFilter').value;
+
+  let filtered = LEADGEN_DATA.filter(r => {
+    if (search && !(r[0].toLowerCase().includes(search) || r[1].toLowerCase().includes(search) || r[6].toLowerCase().includes(search))) return false;
+    if (catFilter && r[1] !== catFilter) return false;
+    if (typeFilter === 'fixed' && r[2] <= 0) return false;
+    if (typeFilter === 'percent' && r[3] <= 0) return false;
+    return true;
+  });
+
+  filtered = sortData(filtered, leadgenSortCol, leadgenSortAsc);
+  renderLeadgen(filtered);
+}
+
+function sortData(data, col, asc) {
+  return [...data].sort((a, b) => {
+    let va = a[col], vb = b[col];
+    if (typeof va === 'number' && typeof vb === 'number') {
+      return asc ? va - vb : vb - va;
+    }
+    va = String(va).toLowerCase();
+    vb = String(vb).toLowerCase();
+    return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+}
+
+// Sortable headers
+document.querySelectorAll('.sortable thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = parseInt(th.dataset.col);
+    const table = th.closest('table');
+    
+    if (leadgenSortCol === col) {
+      leadgenSortAsc = !leadgenSortAsc;
+    } else {
+      leadgenSortCol = col;
+      leadgenSortAsc = th.dataset.type === 'string';
+    }
+
+    table.querySelectorAll('th').forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+    th.classList.add(leadgenSortAsc ? 'sort-asc' : 'sort-desc');
+    filterLeadgen();
+  });
+});
+
+// Initial render
+renderLeadgen(sortData(LEADGEN_DATA, 2, false));
+
+</script>
+
+</body>
+</html>
